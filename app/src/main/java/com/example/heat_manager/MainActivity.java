@@ -6,6 +6,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,12 +23,19 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.StreamGobbler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -349,6 +357,7 @@ public class MainActivity extends AppCompatActivity {
 //        });
     }
 
+    // get heating time
     protected double getHeatingTime(){
         // create reservation object
         reservation = new Reservation();
@@ -374,4 +383,48 @@ public class MainActivity extends AppCompatActivity {
 
         return heatingTime;
     }
+
+    // create connection with raspberry pi
+    public void createConnection(String command) {
+        String hostname = "130.237.177.211";
+        String username = "pi";
+        String password = "IoT@2021";
+        StrictMode.ThreadPolicy policy = new
+                StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        try
+        {
+
+            ch.ethz.ssh2.Connection conn = new ch.ethz.ssh2.Connection(hostname); //init connection
+
+            conn.connect(); //start connection to the hostname
+            boolean isAuthenticated = conn.authenticateWithPassword(username,
+                    password);
+            if (isAuthenticated == false)
+                throw new IOException("Authentication failed.");
+            Session sess = conn.openSession();
+            sess.execCommand(command);
+            InputStream stdout = new StreamGobbler(sess.getStdout());
+            BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
+
+            while (true){
+                String line = br.readLine(); // read line
+                if (line == null)
+                    break;
+                System.out.println(line);
+                //output = line;
+            }
+            /* Show exit status, if available (otherwise "null") */
+            System.out.println("ExitCode: " + sess.getExitStatus());
+            sess.close(); // Close this session
+            conn.close();
+        }
+        catch (IOException e)
+        {
+            System.out.printf(e.toString());
+            e.printStackTrace(System.err);
+            System.exit(2); }
+    }
+
 }
