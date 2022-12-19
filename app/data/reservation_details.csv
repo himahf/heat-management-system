@@ -1,0 +1,6 @@
+id ,guest_name,check_in,check_out,username,password
+1,Lucas,20/12/2022,26/12/2022,lucas,admin
+2,John,24/12/2022,26/12/2023,john,admin
+3,Peter,21/12/2022,28/12/2022,peter,admin
+4,Sam,24/12/2022,30/12/2025,sam,admin
+5,Dan,20/12/2022,21/12/2026,dan,admin
