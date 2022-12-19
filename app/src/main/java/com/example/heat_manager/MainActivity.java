@@ -21,6 +21,10 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.sql.Connection;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -47,6 +51,19 @@ public class MainActivity extends AppCompatActivity {
     Switch editTemp;
 
     int commonTempVal = 10;
+
+    public int currentTemperature = 10;
+    public int targetTemperature = 21;
+    public long targetTime;
+    public double specificVolume = 0.85;
+    public double specificHeatCapacity = 1.005;
+    public int heat = 1500;
+    public double heatLoss;
+    public double coefficientOfHeatTransfer = 0.5;
+    public double heatingTime;
+    public Connection connection;
+    private Reservation reservation;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -330,5 +347,31 @@ public class MainActivity extends AppCompatActivity {
 //
 //            }
 //        });
+    }
+
+    protected double getHeatingTime(){
+        // create reservation object
+        reservation = new Reservation();
+        // need to fetch the data from db
+        reservation.Id = 1;
+        reservation.Height = 3;
+        reservation.Width = 20;
+        reservation.Length = 30;
+        reservation.NoOfPeople = 3;
+        reservation.ObjectCount = 5;
+        String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
+        reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
+        targetTime = reservation.CheckinDate.getTime();
+
+        // calculate heat loss
+        heatLoss = 2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +
+                2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Length * (targetTemperature - currentTemperature));
+
+        // calculate heating time
+        heatingTime = (reservation.Height * reservation.Length * reservation.Width * specificHeatCapacity
+                * (targetTemperature - currentTemperature)) /
+                (specificVolume * (heat - heatLoss));
+
+        return heatingTime;
     }
 }
