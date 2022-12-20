@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -21,7 +20,6 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     boolean invalid = false;
     String Colector="";
     TextView txtalertName;
-    TextView UserName;
+    TextView CurrentTemp;
     TextView UserPassword;
     EditText UserContact;
     EditText UserComment;
@@ -60,8 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
     int commonTempVal = 10;
 
-    public int currentTemperature = 10;
-    public int targetTemperature = 21;
+    public double currentTemperature = 10;
+    public double targetTemperature = 21;
     public long targetTime;
     public double specificVolume = 0.85;
     public double specificHeatCapacity = 1.005;
@@ -71,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     public double heatingTime;
     public Connection connection;
     private Reservation reservation;
+    public String commandOutput;
 
 
     @Override
@@ -78,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //        sp=findViewById(R.id.SpCountry);
-        UserName=(TextView) findViewById(R.id.userName);
+        CurrentTemp=(TextView) findViewById(R.id.currentTemp);
         UserPassword= (TextView) findViewById(R.id.userPassword);
 //        UserContact=findViewById(R.id.userContact);
        // UserComment=findViewById(R.id.usercomment);
@@ -149,6 +148,9 @@ public class MainActivity extends AppCompatActivity {
             numberPickerBath.setTextSize(30);
 
         }
+
+        // read temp sensor value
+        getTemp();
 
         editTemp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -413,7 +415,7 @@ public class MainActivity extends AppCompatActivity {
                 if (line == null)
                     break;
                 System.out.println(line);
-                //output = line;
+                commandOutput = line;
             }
             /* Show exit status, if available (otherwise "null") */
             System.out.println("ExitCode: " + sess.getExitStatus());
@@ -427,4 +429,11 @@ public class MainActivity extends AppCompatActivity {
             System.exit(2); }
     }
 
+    // get temperature
+    public void getTemp(){
+        createConnection("python IOT_Project/TempSen17.py");
+        commandOutput = commandOutput.replace("\"","");
+        currentTemperature = Double.parseDouble(commandOutput);
+        CurrentTemp.setText(Double.toString(currentTemperature));
+    }
 }
