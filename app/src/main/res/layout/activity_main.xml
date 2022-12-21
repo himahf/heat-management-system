@@ -44,7 +44,7 @@
             android:layout_marginLeft="5dp"/>
 
         <TextView
-            android:id="@+id/userName"
+            android:id="@+id/currentTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"

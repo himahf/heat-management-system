@@ -6,8 +6,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -20,10 +20,20 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import ch.ethz.ssh2.Session;
+import ch.ethz.ssh2.StreamGobbler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     boolean invalid = false;
     String Colector="";
     TextView txtalertName;
-    TextView UserName;
+    TextView CurrentTemp;
     TextView UserPassword;
     EditText UserContact;
     EditText UserComment;
@@ -48,12 +58,26 @@ public class MainActivity extends AppCompatActivity {
 
     int commonTempVal = 10;
 
+    public double currentTemperature = 10;
+    public double targetTemperature = 21;
+    public long targetTime;
+    public double specificVolume = 0.85;
+    public double specificHeatCapacity = 1.005;
+    public int heat = 1500;
+    public double heatLoss;
+    public double coefficientOfHeatTransfer = 0.5;
+    public double heatingTime;
+    public Connection connection;
+    private Reservation reservation;
+    public String commandOutput;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 //        sp=findViewById(R.id.SpCountry);
-        UserName=(TextView) findViewById(R.id.userName);
+        CurrentTemp=(TextView) findViewById(R.id.currentTemp);
         UserPassword= (TextView) findViewById(R.id.userPassword);
 //        UserContact=findViewById(R.id.userContact);
        // UserComment=findViewById(R.id.usercomment);
@@ -124,6 +148,9 @@ public class MainActivity extends AppCompatActivity {
             numberPickerBath.setTextSize(30);
 
         }
+
+        // read temp sensor value
+        getTemp();
 
         editTemp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -330,5 +357,83 @@ public class MainActivity extends AppCompatActivity {
 //
 //            }
 //        });
+    }
+
+    // get heating time
+    protected double getHeatingTime(){
+        // create reservation object
+        reservation = new Reservation();
+        // need to fetch the data from db
+        reservation.Id = 1;
+        reservation.Height = 3;
+        reservation.Width = 20;
+        reservation.Length = 30;
+        reservation.NoOfPeople = 3;
+        reservation.ObjectCount = 5;
+        String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
+        reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
+        targetTime = reservation.CheckinDate.getTime();
+
+        // calculate heat loss
+        heatLoss = 2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +
+                2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Length * (targetTemperature - currentTemperature));
+
+        // calculate heating time
+        heatingTime = (reservation.Height * reservation.Length * reservation.Width * specificHeatCapacity
+                * (targetTemperature - currentTemperature)) /
+                (specificVolume * (heat - heatLoss));
+
+        return heatingTime;
+    }
+
+    // create connection with raspberry pi
+    public void createConnection(String command) {
+        String hostname = "130.237.177.211";
+        String username = "pi";
+        String password = "IoT@2021";
+        StrictMode.ThreadPolicy policy = new
+                StrictMode.ThreadPolicy.Builder()
+                .permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        try
+        {
+
+            ch.ethz.ssh2.Connection conn = new ch.ethz.ssh2.Connection(hostname); //init connection
+
+            conn.connect(); //start connection to the hostname
+            boolean isAuthenticated = conn.authenticateWithPassword(username,
+                    password);
+            if (isAuthenticated == false)
+                throw new IOException("Authentication failed.");
+            Session sess = conn.openSession();
+            sess.execCommand(command);
+            InputStream stdout = new StreamGobbler(sess.getStdout());
+            BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
+
+            while (true){
+                String line = br.readLine(); // read line
+                if (line == null)
+                    break;
+                System.out.println(line);
+                commandOutput = line;
+            }
+            /* Show exit status, if available (otherwise "null") */
+            System.out.println("ExitCode: " + sess.getExitStatus());
+            sess.close(); // Close this session
+            conn.close();
+        }
+        catch (IOException e)
+        {
+            System.out.printf(e.toString());
+            e.printStackTrace(System.err);
+            System.exit(2); }
+    }
+
+    // get temperature
+    public void getTemp(){
+        createConnection("python IOT_Project/TempSen17.py");
+        commandOutput = commandOutput.replace("\"","");
+        currentTemperature = Double.parseDouble(commandOutput);
+        CurrentTemp.setText(Double.toString(currentTemperature));
     }
 }
