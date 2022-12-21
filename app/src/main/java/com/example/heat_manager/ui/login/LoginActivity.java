@@ -26,6 +26,17 @@ import com.example.heat_manager.ui.login.LoginViewModel;
 import com.example.heat_manager.ui.login.LoginViewModelFactory;
 import com.example.heat_manager.databinding.ActivityLoginBinding;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.stream.Stream;
+
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
@@ -116,12 +127,35 @@ private ActivityLoginBinding binding;
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+             String fileName =   "reservation_details.csv"
+
+    userExist(, fileName);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
     }
 
+    private boolean userExist(String username, String fileName) {
+        BufferedReader reader;
+
+        try{
+            final InputStream file = getAssets().open("reservation_details.csv");
+            reader = new BufferedReader(new InputStreamReader(file));
+            String line = reader.readLine();
+            while(line != null){
+                String[] data = line.split(",");
+                String user = data[4];
+                if(user.trim().equals(username.trim())){
+                    return true;
+                }
+                line = reader.readLine();
+            }
+        } catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+        return false;
+    }
     private void updateUiWithUser(LoggedInUserView model) {
         String welcome = getString(R.string.welcome) + model.getDisplayName();
         // TODO : initiate successful logged in experience
