@@ -436,4 +436,14 @@ public class MainActivity extends AppCompatActivity {
         currentTemperature = Double.parseDouble(commandOutput);
         CurrentTemp.setText(Double.toString(currentTemperature));
     }
+
+    // get turn on
+    public void trunOn(View v){
+        createConnection("tdtool --on 2");
+    }
+
+    // get turn off
+    public void turnOff(View v){
+        createConnection("tdtool --off 2");
+    }
 }
