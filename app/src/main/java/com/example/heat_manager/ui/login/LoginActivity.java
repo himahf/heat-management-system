@@ -127,9 +127,9 @@ private ActivityLoginBinding binding;
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             String fileName =   "reservation_details.csv"
+             String fileName =   "reservation_details.csv";
 
-    userExist(, fileName);
+    userExist("", fileName);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
             }
