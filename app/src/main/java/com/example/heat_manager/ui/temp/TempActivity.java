@@ -379,7 +379,7 @@ public class TempActivity extends AppCompatActivity {
         reservation.Height = 3;
         reservation.Width = 20;
         reservation.Length = 30;
-        reservation.NoOfPeople = 3;
+        //reservation.NoOfPeople = 3;
         reservation.ObjectCount = 5;
         String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
         reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));

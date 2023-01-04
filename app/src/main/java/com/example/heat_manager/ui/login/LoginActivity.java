@@ -88,6 +88,10 @@ private ActivityLoginBinding binding;
                 }
                 setResult(Activity.RESULT_OK);
 
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
+                startActivity(intent);
+
                 //Complete and destroy login activity once successful
                 finish();
             }
@@ -161,6 +165,7 @@ private ActivityLoginBinding binding;
         String welcome = getString(R.string.welcome) + model.getDisplayName();
         // TODO : initiate successful logged in experience
         Toast.makeText(getApplicationContext(), welcome, Toast.LENGTH_LONG).show();
+
     }
 
     private void showLoginFailed(@StringRes Integer errorString) {

@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // read temp sensor value
-        getTemp();
+       // getTemp();
 
         editTemp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
