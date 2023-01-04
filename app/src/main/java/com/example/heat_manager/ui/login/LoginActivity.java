@@ -127,12 +127,12 @@ private ActivityLoginBinding binding;
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             String fileName =   "reservation_details.csv"
-
-    userExist(, fileName);
+             String fileName =   "reservation_details.csv";
+             String username = String.valueOf(usernameEditText.getText());
+    if (userExist(username, fileName)){
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
-            }
+            }}
         });
     }
 

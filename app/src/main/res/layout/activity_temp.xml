@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="10dp"
-        android:text="Current Status"
+        android:text="Temperature Scheduler"
         android:textColor="@color/cardview_dark_background"
         android:textSize="15dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -351,7 +351,7 @@
         android:layout_height="61dp"
         android:layout_gravity="bottom"
         android:background="#B71C1C"
-        android:text="Set The Temperature"
+        android:text="Click To Submit"
         android:textColor="#F5FBF6" />
     </LinearLayout>
 
