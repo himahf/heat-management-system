@@ -1,0 +1,97 @@
+{
+  "project_info": {
+    "project_number": "350592412282",
+    "project_id": "smartheatmanagement",
+    "storage_bucket": "smartheatmanagement.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350592412282:android:6dec5f1ae362aa7677e9c3",
+        "android_client_info": {
+          "package_name": "com.company.smartheatmanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350592412282-99dp7d39sciffmdhtfnvmqjtqsmo419r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuKtIJXtlUO7j28FmsSvgW-mthoMlGvLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350592412282-99dp7d39sciffmdhtfnvmqjtqsmo419r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350592412282:android:e06408a0fe84b9c677e9c3",
+        "android_client_info": {
+          "package_name": "com.example.heat_manager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350592412282-99dp7d39sciffmdhtfnvmqjtqsmo419r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuKtIJXtlUO7j28FmsSvgW-mthoMlGvLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350592412282-99dp7d39sciffmdhtfnvmqjtqsmo419r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350592412282:android:0eff7cf496d5478377e9c3",
+        "android_client_info": {
+          "package_name": "com.example.myapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350592412282-99dp7d39sciffmdhtfnvmqjtqsmo419r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuKtIJXtlUO7j28FmsSvgW-mthoMlGvLY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350592412282-99dp7d39sciffmdhtfnvmqjtqsmo419r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

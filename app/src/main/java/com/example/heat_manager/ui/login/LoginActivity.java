@@ -131,6 +131,7 @@ private ActivityLoginBinding binding;
 
     userExist("", fileName);
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
                 startActivity(intent);
             }
         });

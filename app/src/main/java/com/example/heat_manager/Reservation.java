@@ -9,6 +9,6 @@ public class Reservation {
     public int Height;
     public int Width;
     public int Length;
-    public int NoOfPeople;
+   // public int NoOfPeople;
     public int ObjectCount;
 }

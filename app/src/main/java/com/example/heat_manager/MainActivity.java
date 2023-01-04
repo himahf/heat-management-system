@@ -1,12 +1,17 @@
 package com.example.heat_manager;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -20,6 +25,12 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,12 +81,17 @@ public class MainActivity extends AppCompatActivity {
     public Connection connection;
     private Reservation reservation;
     public String commandOutput;
-
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //Get text from Intent
+        Intent intent = getIntent();
+        username = intent.getStringExtra("PersonalNumber");
+
 //        sp=findViewById(R.id.SpCountry);
         CurrentTemp=(TextView) findViewById(R.id.currentTemp);
         UserPassword= (TextView) findViewById(R.id.userPassword);
@@ -362,21 +378,28 @@ public class MainActivity extends AppCompatActivity {
     // get heating time
     protected double getHeatingTime(){
         // create reservation object
-        reservation = new Reservation();
+        /*reservation = new Reservation();
         // need to fetch the data from db
         reservation.Id = 1;
         reservation.Height = 3;
         reservation.Width = 20;
         reservation.Length = 30;
-        reservation.NoOfPeople = 3;
+        //reservation.NoOfPeople = 3;
         reservation.ObjectCount = 5;
         String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
         reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
         targetTime = reservation.CheckinDate.getTime();
 
+         */
+
+        // heat loss due to an object
+        // assumption
+        int heatLossForObject = 5;
+
         // calculate heat loss
-        heatLoss = 2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +
-                2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Length * (targetTemperature - currentTemperature));
+        heatLoss = (2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +
+                2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Length * (targetTemperature - currentTemperature))) +
+                (reservation.ObjectCount * heatLossForObject);
 
         // calculate heating time
         heatingTime = (reservation.Height * reservation.Length * reservation.Width * specificHeatCapacity
@@ -446,4 +469,33 @@ public class MainActivity extends AppCompatActivity {
     public void turnOff(View v){
         createConnection("tdtool --off 2");
     }
+
+    void getReservationDetails(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("Customers")
+                .whereEqualTo("PersonalNumber",username)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                reservation = new Reservation();
+                                // need to fetch the data from db
+                                reservation.Id = Integer.parseInt(document.getId());
+                                reservation.Height = (int) document.get("Height");
+                                reservation.Width = (int) document.get("Width");
+                                reservation.Length = (int) document.get("Length");
+                                //reservation.NoOfPeople = 3;
+                                reservation.ObjectCount = (int) document.get("ObjectCount");
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+    }
+
+
 }
