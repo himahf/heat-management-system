@@ -1,18 +1,10 @@
-package com.example.heat_manager;
-
-import static android.content.ContentValues.TAG;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.heat_manager.ui.temp;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -28,14 +20,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.heat_manager.ui.login.LoginActivity;
-import com.example.heat_manager.ui.temp.TempActivity;
+import com.example.heat_manager.R;
+import com.example.heat_manager.Reservation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -51,7 +40,7 @@ import java.util.List;
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
 
-public class MainActivity extends AppCompatActivity {
+public class TempActivity extends AppCompatActivity {
 
     Spinner sp;
     boolean invalid = false;
@@ -86,26 +75,19 @@ public class MainActivity extends AppCompatActivity {
     public Connection connection;
     private Reservation reservation;
     public String commandOutput;
-    private String username;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        //Get text from Intent
-        Intent intent = getIntent();
-        username = intent.getStringExtra("PersonalNumber");
-
-        //this.getActionBar().setTitle("Smart Heat System");
-//        sp=findViewById(R.id.SpCountry);
+        setContentView(R.layout.activity_temp);
         ActionBar actionBar = getSupportActionBar();
-       // actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_launcher_background));
+
         actionBar.setDisplayShowCustomEnabled(true);
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.logo, null);
         actionBar.setCustomView(view);
-
+//        sp=findViewById(R.id.SpCountry);
         CurrentTemp=(TextView) findViewById(R.id.currentTemp);
         UserPassword= (TextView) findViewById(R.id.userPassword);
 //        UserContact=findViewById(R.id.userContact);
@@ -179,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // read temp sensor value
-        getTemp();
+        //getTemp();
 
         editTemp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -262,8 +244,6 @@ public class MainActivity extends AppCompatActivity {
 //                    Toast.makeText(MainActivity.this,"User Info \n:"+Colector,Toast.LENGTH_SHORT).show();
 //                }
 //
-                Intent intent = new Intent(MainActivity.this, TempActivity.class);
-                startActivity(intent);
             }
         });
         btnInDatePicker.setOnClickListener(new View.OnClickListener() {
@@ -393,28 +373,21 @@ public class MainActivity extends AppCompatActivity {
     // get heating time
     protected double getHeatingTime(){
         // create reservation object
-        /*reservation = new Reservation();
+        reservation = new Reservation();
         // need to fetch the data from db
         reservation.Id = 1;
         reservation.Height = 3;
         reservation.Width = 20;
         reservation.Length = 30;
-        //reservation.NoOfPeople = 3;
+        reservation.NoOfPeople = 3;
         reservation.ObjectCount = 5;
         String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
         reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
         targetTime = reservation.CheckinDate.getTime();
 
-         */
-
-        // heat loss due to an object
-        // assumption
-        int heatLossForObject = 5;
-
         // calculate heat loss
-        heatLoss = (2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +
-                2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Length * (targetTemperature - currentTemperature))) +
-                (reservation.ObjectCount * heatLossForObject);
+        heatLoss = 2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +
+                2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Length * (targetTemperature - currentTemperature));
 
         // calculate heating time
         heatingTime = (reservation.Height * reservation.Length * reservation.Width * specificHeatCapacity
@@ -474,43 +447,4 @@ public class MainActivity extends AppCompatActivity {
         currentTemperature = Double.parseDouble(commandOutput);
         CurrentTemp.setText(Double.toString(currentTemperature));
     }
-
-    // get turn on
-    public void trunOn(View v){
-        createConnection("tdtool --on 2");
-    }
-
-    // get turn off
-    public void turnOff(View v){
-        createConnection("tdtool --off 2");
-    }
-
-    void getReservationDetails(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("Customers")
-                .whereEqualTo("PersonalNumber",username)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                reservation = new Reservation();
-                                // need to fetch the data from db
-                                reservation.Id = Integer.parseInt(document.getId());
-                                reservation.Height = (int) document.get("Height");
-                                reservation.Width = (int) document.get("Width");
-                                reservation.Length = (int) document.get("Length");
-                                //reservation.NoOfPeople = 3;
-                                reservation.ObjectCount = (int) document.get("ObjectCount");
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
-                        }
-                    }
-                });
-    }
-
-
 }

@@ -128,12 +128,12 @@ private ActivityLoginBinding binding;
             @Override
             public void onClick(View v) {
              String fileName =   "reservation_details.csv";
-
-    userExist("", fileName);
+             String username = String.valueOf(usernameEditText.getText());
+    if (userExist(username, fileName)){
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
                 startActivity(intent);
-            }
+            }}
         });
     }
 
