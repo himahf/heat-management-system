@@ -2,8 +2,10 @@ package com.example.heat_manager.ui.temp;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,8 +25,10 @@ import android.widget.TimePicker;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.heat_manager.MainActivity;
 import com.example.heat_manager.R;
 import com.example.heat_manager.Reservation;
+import com.example.heat_manager.ui.login.LoginActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -48,18 +52,17 @@ public class TempActivity extends AppCompatActivity {
     TextView txtalertName;
     TextView CurrentTemp;
     TextView UserPassword;
+    TextView TxtCountDown;
     EditText UserContact;
     EditText UserComment;
-    Button SubmitSave;
+    Button BtnStopHeat;
+    Button BtnSetNew;
     RadioButton Malebtn,Femalbtn;
     CheckBox html,css,php;
     Button btnInDatePicker, btnInTimePicker,btnOutDatePicker, btnOutTimePicker;
     EditText txtInDate,txtInTime,txtOutDate,txtOutTime;
     private int mYear, mMonth, mDay, mHour, mMinute;
     private int mYear1, mMonth1, mDay1, mHour1, mMinute1;
-
-    NumberPicker numberPicker, numberPickerLiving, numberPickerBed, numberPickerKitchen, numberPickerBath;
-    Switch editTemp;
 
     int commonTempVal = 10;
 
@@ -75,6 +78,7 @@ public class TempActivity extends AppCompatActivity {
     public Connection connection;
     private Reservation reservation;
     public String commandOutput;
+    public int counter;
 
 
     @Override
@@ -88,7 +92,7 @@ public class TempActivity extends AppCompatActivity {
         View view = layoutInflater.inflate(R.layout.logo, null);
         actionBar.setCustomView(view);
 //        sp=findViewById(R.id.SpCountry);
-        CurrentTemp=(TextView) findViewById(R.id.currentTemp);
+       // CurrentTemp=(TextView) findViewById(R.id.currentTemp);
         UserPassword= (TextView) findViewById(R.id.userPassword);
 //        UserContact=findViewById(R.id.userContact);
        // UserComment=findViewById(R.id.usercomment);
@@ -98,246 +102,32 @@ public class TempActivity extends AppCompatActivity {
        // html=findViewById(R.id.HTML);
      //   css=findViewById(R.id.CSS);
      //   php=findViewById(R.id.PHP);
-        SubmitSave=findViewById(R.id.btnSubmit);
-        btnInDatePicker = (Button) findViewById(R.id.btn_in_date);
-        btnInTimePicker=(Button) findViewById(R.id.btn_in_time);
-        txtInDate=(EditText)findViewById(R.id.in_date);
-        txtInTime=(EditText)findViewById(R.id.in_time);
-
-        btnOutDatePicker = (Button) findViewById(R.id.btn_out_date);
-        btnOutTimePicker=(Button) findViewById(R.id.btn_out_time);
-        txtOutDate=(EditText)findViewById(R.id.out_date);
-        txtOutTime=(EditText)findViewById(R.id.out_time);
-
-        numberPicker = (NumberPicker) findViewById(R.id.numberPicker);
-        numberPickerLiving = (NumberPicker) findViewById(R.id.numberPickerLiving);
-        numberPickerBed = (NumberPicker) findViewById(R.id.numberPickerBed);
-        numberPickerKitchen = (NumberPicker) findViewById(R.id.numberPickerKitchen);
-        numberPickerBath = (NumberPicker) findViewById(R.id.numberPickerBath);
-
-        editTemp = (Switch) findViewById(R.id.editTemp);
-
-        //Populate NumberPicker values from minimum and maximum value range
-        numberPicker.setMinValue(0);
-        numberPicker.setMaxValue(1000);
-        numberPickerLiving.setMinValue(0);
-        numberPickerLiving.setMaxValue(1000);
-        numberPickerBed.setMinValue(0);
-        numberPickerBed.setMaxValue(1000);
-        numberPickerKitchen.setMinValue(0);
-        numberPickerKitchen.setMaxValue(1000);
-        numberPickerBath.setMinValue(0);
-        numberPickerBath.setMaxValue(1000);
-
-        numberPicker.setWrapSelectorWheel(true);
-        numberPickerLiving.setWrapSelectorWheel(true);
-        numberPickerBed.setWrapSelectorWheel(true);
-        numberPickerKitchen.setWrapSelectorWheel(true);
-        numberPickerBath.setWrapSelectorWheel(true);
-
-        numberPicker.setValue(commonTempVal);
-        numberPicker.setEnabled(true);
-
-        numberPickerLiving.setValue(commonTempVal);
-        numberPickerLiving.setEnabled(false);
-
-        numberPickerBed.setValue(commonTempVal);
-        numberPickerBed.setEnabled(false);
-
-        numberPickerKitchen.setValue(commonTempVal);
-        numberPickerKitchen.setEnabled(false);
-
-        numberPickerBath.setValue(commonTempVal);
-        numberPickerBath.setEnabled(false);
-
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            numberPicker.setTextSize(30);
-            numberPickerLiving.setTextSize(30);
-            numberPickerBed.setTextSize(30);
-            numberPickerKitchen.setTextSize(30);
-            numberPickerBath.setTextSize(30);
-
-        }
-
+        BtnStopHeat=findViewById(R.id.btnStopHeat);
+        BtnSetNew=findViewById(R.id.btnSetNew);
+        TxtCountDown=findViewById(R.id.countDown);
         // read temp sensor value
         //getTemp();
 
-        editTemp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if(isChecked){
+        new CountDownTimer(30000, 1000) {
 
-                    numberPicker.setEnabled(true);
-                    numberPickerLiving.setEnabled(true);
-                    numberPickerBed.setEnabled(true);
-                    numberPickerKitchen.setEnabled(true);
-                    numberPickerBath.setEnabled(true);
-                    numberPickerLiving.setValue(numberPicker.getValue());
-                    numberPickerBed.setValue(numberPicker.getValue());
-                    numberPickerKitchen.setValue(numberPicker.getValue());
-                    numberPickerBath.setValue(numberPicker.getValue());
-                }
-                if(!isChecked){
-                    numberPicker.setEnabled(true);
-                    numberPickerLiving.setEnabled(false);
-                    numberPickerBed.setEnabled(false);
-                    numberPickerKitchen.setEnabled(false);
-                    numberPickerBath.setEnabled(false);
-
-                    numberPickerLiving.setValue(numberPicker.getValue());
-                    numberPickerBed.setValue(numberPicker.getValue());
-                    numberPickerKitchen.setValue(numberPicker.getValue());
-                    numberPickerBath.setValue(numberPicker.getValue());
-
-
-                }
-
+            public void onTick(long millisUntilFinished) {
+                TxtCountDown.setText("Time Remain = " +millisUntilFinished / 1000);
             }
-        });
 
-        SubmitSave.setOnClickListener(new View.OnClickListener() {
+            public void onFinish() {
+                TxtCountDown.setText("done!");
+            }
+        }.start();
+
+
+        BtnSetNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                String name = UserName.getText().toString();
-//                String Pascode=UserPassword.getText().toString();
-//                String contact=UserContact.getText().toString();
-//                String comment=UserComment.getText().toString();
-//                if (name.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the password field",Toast.LENGTH_SHORT).show();
-//                }
-//                else if (name.equals("Sameh") ||name.equals("UlHaq")){
-//                    invalid=true;
-//                    txtalertName.setText("Name Already exist");
-//                }
-//
-//                else if(Pascode.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the password field",Toast.LENGTH_SHORT).show();
-//                }
-//
-//
-//                else if (contact.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the Contact field",Toast.LENGTH_SHORT).show();
-//                }
-//
-//                else if (comment.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the Comment field",Toast.LENGTH_SHORT).show();
-//                }
-//
-//
-//
-//                else{
-//
-//                    Colector+=name+"\n";
-//                    Colector+=Pascode+"\n";
-//                    Colector+=contact+"\n";
-//                    Colector+=comment+"\n";
-//                    if (html.isChecked()){
-//                        Colector+="HTML"+"\n";
-//                        if (css.isChecked()){
-//                            Colector+="CSS"+"\n";
-//                        }
-//                        if (php.isChecked()){
-//                            Colector+="PHP"+"\n";
-//                        }
-//                    }
-//                    Toast.makeText(MainActivity.this,"User Info \n:"+Colector,Toast.LENGTH_SHORT).show();
-//                }
-//
+                Intent intent = new Intent(TempActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
-        btnInDatePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Get Current Date
-                final Calendar c = Calendar.getInstance();
-                mYear = c.get(Calendar.YEAR);
-                mMonth = c.get(Calendar.MONTH);
-                mDay = c.get(Calendar.DAY_OF_MONTH);
 
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog( view.getContext(),
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-
-                                txtInDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-
-                            }
-                        }, mYear, mMonth, mDay);
-                datePickerDialog.show();
-            }
-        });
-        btnOutDatePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Get Current Date
-                final Calendar c = Calendar.getInstance();
-                mYear1 = c.get(Calendar.YEAR);
-                mMonth1 = c.get(Calendar.MONTH);
-                mDay1 = c.get(Calendar.DAY_OF_MONTH);
-
-
-                DatePickerDialog datePickerDialog = new DatePickerDialog( view.getContext(),
-                        new DatePickerDialog.OnDateSetListener() {
-
-                            @Override
-                            public void onDateSet(DatePicker view, int year,
-                                                  int monthOfYear, int dayOfMonth) {
-
-                                txtOutDate.setText(dayOfMonth + "-" + (monthOfYear + 1) + "-" + year);
-
-                            }
-                        }, mYear1, mMonth1, mDay1);
-                datePickerDialog.show();
-            }
-        });
-        btnInTimePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Get Current Time
-                final Calendar c = Calendar.getInstance();
-                mHour = c.get(Calendar.HOUR_OF_DAY);
-                mMinute = c.get(Calendar.MINUTE);
-
-                // Launch Time Picker Dialog
-                TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
-                        new TimePickerDialog.OnTimeSetListener() {
-
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay,
-                                                  int minute) {
-
-                                txtInTime.setText(hourOfDay + ":" + minute);
-                            }
-                        }, mHour, mMinute, false);
-                timePickerDialog.show();
-            }
-        });
-        btnOutTimePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Get Current Time
-                final Calendar c = Calendar.getInstance();
-                mHour1 = c.get(Calendar.HOUR_OF_DAY);
-                mMinute1 = c.get(Calendar.MINUTE);
-
-                // Launch Time Picker Dialog
-                TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
-                        new TimePickerDialog.OnTimeSetListener() {
-
-                            @Override
-                            public void onTimeSet(TimePicker view, int hourOfDay,
-                                                  int minute) {
-
-                                txtOutTime.setText(hourOfDay + ":" + minute);
-                            }
-                        }, mHour1, mMinute1, false);
-                timePickerDialog.show();
-            }
-        });
         List<String> categoryCountry=new ArrayList<>();
         categoryCountry.add("Select Country");
         categoryCountry.add("PAKISTAN");
