@@ -572,7 +572,8 @@ public class MainActivity extends AppCompatActivity {
                 createConnection("tdtool --on 2");
             }
             else{
-
+                Intent intent = new Intent(MainActivity.this, TempActivity.class);
+                startActivity(intent);
             }
         }
         catch (ParseException e){
