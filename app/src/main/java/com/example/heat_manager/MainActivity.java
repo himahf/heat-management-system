@@ -269,8 +269,8 @@ public class MainActivity extends AppCompatActivity {
 //                    Toast.makeText(MainActivity.this,"User Info \n:"+Colector,Toast.LENGTH_SHORT).show();
 //                }
 //
-                //Intent intent = new Intent(MainActivity.this, TempActivity.class);
-                //startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, TempActivity.class);
+                startActivity(intent);
 
                 setTemperature();
             }
