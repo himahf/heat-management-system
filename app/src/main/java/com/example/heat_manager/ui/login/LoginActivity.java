@@ -85,12 +85,13 @@ private ActivityLoginBinding binding;
                 }
                 if (loginResult.getSuccess() != null) {
                     updateUiWithUser(loginResult.getSuccess());
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
+                    startActivity(intent);
                 }
                 setResult(Activity.RESULT_OK);
 
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
-                startActivity(intent);
+
 
                 //Complete and destroy login activity once successful
                 finish();
@@ -120,10 +121,12 @@ private ActivityLoginBinding binding;
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                /*if (actionId == EditorInfo.IME_ACTION_DONE) {
                     loginViewModel.login(usernameEditText.getText().toString(),
                             passwordEditText.getText().toString());
                 }
+
+                 */
                 return false;
             }
         });
@@ -133,10 +136,11 @@ private ActivityLoginBinding binding;
             public void onClick(View v) {
              String fileName =   "reservation_details.csv";
              String username = String.valueOf(usernameEditText.getText());
-    if (userExist(username, fileName)){
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
-                startActivity(intent);
+             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+             intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
+             startActivity(intent);
+             if (userExist(username, fileName)){
+
             }}
         });
     }

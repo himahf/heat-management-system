@@ -19,7 +19,7 @@ import java.io.IOException;
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 public class LoginDataSource {
-    LoggedInUser fakeUser = new LoggedInUser("","");
+    LoggedInUser fakeUser ;
     public Result<LoggedInUser> login(String username, String password) {
 
         try {
@@ -39,12 +39,15 @@ public class LoginDataSource {
                                     fakeUser = new LoggedInUser(
                                             document.get("PersonalNumber").toString(),
                                             document.get("Name").toString());
+
                                     //Log.d(TAG, document.getId() + " => " + document.get("Name"));
                                 }
                             } else {
                                 Log.d(TAG, "Error getting documents: ", task.getException());
                             }
+
                         }
+
                     });
 
 
@@ -54,6 +57,7 @@ public class LoginDataSource {
                             "Jane Doe");
 
 */
+
 
             return new Result.Success<>(fakeUser);
         } catch (Exception e) {

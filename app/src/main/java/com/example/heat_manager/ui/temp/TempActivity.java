@@ -382,8 +382,8 @@ public class TempActivity extends AppCompatActivity {
         //reservation.NoOfPeople = 3;
         reservation.ObjectCount = 5;
         String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
-        reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
-        targetTime = reservation.CheckinDate.getTime();
+        //reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
+        //targetTime = reservation.CheckinDate.getTime();
 
         // calculate heat loss
         heatLoss = 2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +

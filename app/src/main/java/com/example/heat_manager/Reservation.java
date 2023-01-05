@@ -4,8 +4,10 @@ import java.util.Date;
 
 public class Reservation {
     public int Id;
-    public Date CheckinDate;
-    //    public Time CheckinTime;
+    public String CheckinDate;
+    public String CheckinTime;
+    public String CheckoutDate;
+    public String CheckoutTime;
     public int Height;
     public int Width;
     public int Length;

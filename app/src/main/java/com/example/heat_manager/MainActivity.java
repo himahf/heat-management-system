@@ -42,11 +42,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import ch.ethz.ssh2.Session;
 import ch.ethz.ssh2.StreamGobbler;
@@ -72,17 +75,17 @@ public class MainActivity extends AppCompatActivity {
     NumberPicker numberPicker, numberPickerLiving, numberPickerBed, numberPickerKitchen, numberPickerBath;
     Switch editTemp;
 
-    int commonTempVal = 10;
+    int commonTempVal = 24;
 
-    public double currentTemperature = 10;
-    public double targetTemperature = 21;
+    public double currentTemperature = 22;
+    public double targetTemperature = 24;
     public long targetTime;
     public double specificVolume = 0.85;
     public double specificHeatCapacity = 1.005;
     public int heat = 1500;
     public double heatLoss;
     public double coefficientOfHeatTransfer = 0.5;
-    public double heatingTime;
+    public double heatingTime=0;
     public Connection connection;
     private Reservation reservation;
     public String commandOutput;
@@ -96,6 +99,7 @@ public class MainActivity extends AppCompatActivity {
         //Get text from Intent
         Intent intent = getIntent();
         username = intent.getStringExtra("PersonalNumber");
+        Log.d(TAG, username);
 
         //this.getActionBar().setTitle("Smart Heat System");
 //        sp=findViewById(R.id.SpCountry);
@@ -179,7 +183,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // read temp sensor value
-       // getTemp();
+        getTemp();
+
+        // get reservation details
+        getReservationDetails();
 
         editTemp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -262,8 +269,10 @@ public class MainActivity extends AppCompatActivity {
 //                    Toast.makeText(MainActivity.this,"User Info \n:"+Colector,Toast.LENGTH_SHORT).show();
 //                }
 //
-                Intent intent = new Intent(MainActivity.this, TempActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(MainActivity.this, TempActivity.class);
+                //startActivity(intent);
+
+                setTemperature();
             }
         });
         btnInDatePicker.setOnClickListener(new View.OnClickListener() {
@@ -392,6 +401,7 @@ public class MainActivity extends AppCompatActivity {
 
     // get heating time
     protected double getHeatingTime(){
+
         // create reservation object
         /*reservation = new Reservation();
         // need to fetch the data from db
@@ -421,6 +431,7 @@ public class MainActivity extends AppCompatActivity {
                 * (targetTemperature - currentTemperature)) /
                 (specificVolume * (heat - heatLoss));
 
+        System.out.println("heating time: "+heatingTime);
         return heatingTime;
     }
 
@@ -473,6 +484,7 @@ public class MainActivity extends AppCompatActivity {
         commandOutput = commandOutput.replace("\"","");
         currentTemperature = Double.parseDouble(commandOutput);
         CurrentTemp.setText(Double.toString(currentTemperature));
+        System.out.println("Temp sensor value: " + currentTemperature);
     }
 
     // get turn on
@@ -499,11 +511,23 @@ public class MainActivity extends AppCompatActivity {
                                 reservation = new Reservation();
                                 // need to fetch the data from db
                                 reservation.Id = Integer.parseInt(document.getId());
-                                reservation.Height = (int) document.get("Height");
-                                reservation.Width = (int) document.get("Width");
-                                reservation.Length = (int) document.get("Length");
+                                reservation.Height = Integer.parseInt(document.get("Height").toString());
+                                reservation.Width = Integer.parseInt(document.get("Width").toString());
+                                reservation.Length = Integer.parseInt(document.get("Length").toString());
                                 //reservation.NoOfPeople = 3;
-                                reservation.ObjectCount = (int) document.get("ObjectCount");
+                                reservation.ObjectCount = Integer.parseInt(document.get("ObjectCount").toString());
+                                reservation.CheckinDate = document.get("CheckinDate").toString();
+                                reservation.CheckinTime = document.get("CheckinTime").toString();
+                                reservation.CheckoutDate = document.get("CheckoutDate").toString();
+                                reservation.CheckoutTime = document.get("CheckoutTime").toString();
+
+
+                                txtInDate.setText(reservation.CheckinDate);
+                                txtInTime.setText(reservation.CheckinTime);
+                                txtOutDate.setText(reservation.CheckoutDate);
+                                txtOutTime.setText(reservation.CheckoutTime);
+
+
                             }
                         } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
@@ -512,5 +536,51 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
+    public void setTemperature() {
 
+        try{
+            long duration = 0;
+            Date currentTime = Calendar.getInstance().getTime();
+            final Calendar c = Calendar.getInstance();
+            mHour = c.get(Calendar.HOUR_OF_DAY);
+            mMinute = c.get(Calendar.MINUTE);
+            System.out.println("Current time: " + mHour +":" + mMinute);
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm");
+
+            Date date1 = simpleDateFormat.parse(mHour +":" + mMinute);
+            Date date2 = simpleDateFormat.parse(reservation.CheckinTime);
+
+            long difference = date2.getTime() - date1.getTime();
+            long mints = TimeUnit
+                    .MILLISECONDS
+                    .toMinutes(difference)
+                    % 60;
+            long hours
+                    = TimeUnit
+                    .MILLISECONDS
+                    .toHours(difference)
+                    % 24;
+            Log.i("duration","="+hours+":"+mints);
+
+            duration = (hours*60)+mints;
+            Log.i("duration","="+duration);
+
+            getHeatingTime();
+
+            if(heatingTime > duration){
+                createConnection("tdtool --on 2");
+            }
+            else{
+
+            }
+        }
+        catch (ParseException e){
+            System.out.printf(e.toString());
+        }
+        catch (Exception e){
+            System.out.printf(e.toString());
+        }
+
+    }
 }
