@@ -111,7 +111,7 @@ public class TempActivity extends AppCompatActivity {
         new CountDownTimer(30000, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                TxtCountDown.setText("Seconds Remain = " +millisUntilFinished / 1000);
+                TxtCountDown.setText("Time Remain = " +millisUntilFinished / 1000);
             }
 
             public void onFinish() {
