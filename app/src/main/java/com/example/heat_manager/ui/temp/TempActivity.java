@@ -1,26 +1,19 @@
 package com.example.heat_manager.ui.temp;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StrictMode;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,7 +21,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.heat_manager.MainActivity;
 import com.example.heat_manager.R;
 import com.example.heat_manager.Reservation;
-import com.example.heat_manager.ui.login.LoginActivity;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,10 +29,9 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import ch.ethz.ssh2.Session;
@@ -53,7 +44,7 @@ public class TempActivity extends AppCompatActivity {
     String Colector="";
     TextView txtalertName;
     TextView CurrentTemp;
-    TextView UserPassword;
+    TextView TargetTemp;
     TextView TxtCountDown;
     EditText UserContact;
     EditText UserComment;
@@ -88,107 +79,93 @@ public class TempActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_temp);
-        ActionBar actionBar = getSupportActionBar();
+        try {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_temp);
+            ActionBar actionBar = getSupportActionBar();
 
-        actionBar.setDisplayShowCustomEnabled(true);
-        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-        View view = layoutInflater.inflate(R.layout.logo, null);
-        actionBar.setCustomView(view);
+            actionBar.setDisplayShowCustomEnabled(true);
+            LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
+            View view = layoutInflater.inflate(R.layout.logo, null);
+            actionBar.setCustomView(view);
 //        sp=findViewById(R.id.SpCountry);
-        CurrentTemp=(TextView) findViewById(R.id.userPassword1);
-        UserPassword= (TextView) findViewById(R.id.userPassword);
+            CurrentTemp=(TextView) findViewById(R.id.userPassword1);
+            TargetTemp= (TextView) findViewById(R.id.TargetTemp);
 //        UserContact=findViewById(R.id.userContact);
-       // UserComment=findViewById(R.id.usercomment);
-        txtalertName=findViewById(R.id.userAlert);
-      //  Malebtn =findViewById(R.id.Male);
-     //   Femalbtn=findViewById(R.id.Female);
-       // html=findViewById(R.id.HTML);
-     //   css=findViewById(R.id.CSS);
-     //   php=findViewById(R.id.PHP);
-        BtnStopHeat=findViewById(R.id.btnStopHeat);
-        BtnSetNew=findViewById(R.id.btnSetNew);
-        TxtCountDown=findViewById(R.id.countDown);
-        // read temp sensor value
-        //getTemp();
+            // UserComment=findViewById(R.id.usercomment);
+            txtalertName=findViewById(R.id.userAlert);
+            //  Malebtn =findViewById(R.id.Male);
+            //   Femalbtn=findViewById(R.id.Female);
+            // html=findViewById(R.id.HTML);
+            //   css=findViewById(R.id.CSS);
+            //   php=findViewById(R.id.PHP);
+            BtnStopHeat=findViewById(R.id.btnStopHeat);
+            BtnSetNew=findViewById(R.id.btnSetNew);
+            TxtCountDown=findViewById(R.id.countDown);
+            // read temp sensor value
+            //getTemp();
 
-        Intent intent = getIntent();
-        String HeatingTime = intent.getStringExtra("HeatingTime");
-        String TargetTemp = intent.getStringExtra("TargetTemp");
-        String CurrentTem = intent.getStringExtra("CurrentTemp");
+            Intent intent = getIntent();
+            String RemainingSeconds = intent.getStringExtra("RemainingSeconds");
+            String TargetTem = intent.getStringExtra("TargetTemp");
+            String CurrentTem = intent.getStringExtra("CurrentTemp");
 
-        int Heating_Time = Integer.parseInt(HeatingTime)*1000;
-        System.out.printf("Heating_Time"+Heating_Time);
-        UserPassword.setText(TargetTemp);
-        CurrentTemp.setText(CurrentTem);
+            int Heating_Time = Integer.parseInt(RemainingSeconds)*1000;
+            System.out.printf("Heating_Time"+Heating_Time);
+            TargetTemp.setText(TargetTem);
+            CurrentTemp.setText(CurrentTem);
 
-        countDownTimer = new CountDownTimer(Heating_Time, 1000) {
+            countDownTimer = new CountDownTimer(Heating_Time, 1000) {
 
-            public void onTick(long millisUntilFinished) {
-                //TxtCountDown.setText("Time Remain = " +millisUntilFinished/1000 );
-                // Used for formatting digit to be in 2 digits only
+                public void onTick(long millisUntilFinished) {
+                    //TxtCountDown.setText("Time Remain = " +millisUntilFinished/1000 );
+                    // Used for formatting digit to be in 2 digits only
 
-                NumberFormat f = new DecimalFormat("00");
+                    NumberFormat f = new DecimalFormat("00");
 
-                long hours = (millisUntilFinished / 3600000) % 24;
-                long mins = (millisUntilFinished / 60000) % 60;
-                long secs = (millisUntilFinished / 1000) % 60;
+                    long hours = (millisUntilFinished / 3600000) % 24;
+                    long mins = (millisUntilFinished / 60000) % 60;
+                    long secs = (millisUntilFinished / 1000) % 60;
 
-                startCounter = true;
-                TxtCountDown.setText(f.format(hours) + ":" + f.format(mins) + ":" + f.format(secs));
-            }
+                    startCounter = true;
+                    TxtCountDown.setText(f.format(hours) + ":" + f.format(mins) + ":" + f.format(secs));
+                }
 
-            public void onFinish() {
-                TxtCountDown.setText("Done!");
-                createConnection("tdtool --on 2");
-                heaterOn = true;
-                startCounter = false;
-            }
-        }.start();
+                public void onFinish() {
+                    TxtCountDown.setText("Done!");
+                    createConnection("tdtool --on 2");
+                    heaterOn = true;
+                    startCounter = false;
+                }
+            }.start();
 
 
-        BtnSetNew.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createConnection("tdtool --off 2");
-                heaterOn = false;
+            BtnSetNew.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    createConnection("tdtool --off 2");
+                    heaterOn = false;
 
-                Intent intent = new Intent(TempActivity.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
+                    Intent intent = new Intent(TempActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
+            });
 
-        List<String> categoryCountry=new ArrayList<>();
-        categoryCountry.add("Select Country");
-        categoryCountry.add("PAKISTAN");
-        categoryCountry.add("AFGHANISTAN");
-        categoryCountry.add("UAE");
-        categoryCountry.add("TURKEY");
-        categoryCountry.add("AMERICA");
-        ArrayAdapter<String> arrayAdapter;
-        arrayAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,categoryCountry);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        sp.setAdapter(arrayAdapter);
-//        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
-//                if(parent.getItemAtPosition(position).equals("Select Country")){
-//                    //Do Nothing
-//
-//                }
-//                else{
-//                    String item=parent.getItemAtPosition(position).toString();
-//                    Colector+=item+"\n";
-//                    Toast.makeText(MainActivity.this, "Selected Country: "+item, Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
+            List<String> categoryCountry=new ArrayList<>();
+            categoryCountry.add("Select Country");
+            categoryCountry.add("PAKISTAN");
+            categoryCountry.add("AFGHANISTAN");
+            categoryCountry.add("UAE");
+            categoryCountry.add("TURKEY");
+            categoryCountry.add("AMERICA");
+            ArrayAdapter<String> arrayAdapter;
+            arrayAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,categoryCountry);
+            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        }
+        catch(Exception e) {
+
+        }
+
     }
 
     // get heating time
@@ -276,11 +253,11 @@ public class TempActivity extends AppCompatActivity {
             createConnection("tdtool --off 2");
             BtnStopHeat.setText("RESUME HEATING");
             heaterOn = false;
-            countDownTimer.cancel();
+            //countDownTimer.cancel();
         }
-        else if(heaterOn==false & startCounter){
+        //else if(heaterOn==false & startCounter){
 
-        }
+        //}
         else{
             createConnection("tdtool --on 2");
             BtnStopHeat.setText("STOP HEATING");

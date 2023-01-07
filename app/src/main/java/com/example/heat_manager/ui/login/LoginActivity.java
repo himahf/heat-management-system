@@ -46,6 +46,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 public class LoginActivity extends AppCompatActivity {
@@ -145,37 +148,38 @@ private ActivityLoginBinding binding;
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-             String fileName =   "reservation_details.csv";
-             String username = String.valueOf(usernameEditText.getText());
-             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-             intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
-             startActivity(intent);
-             if (userExist(username, fileName)){
-
-             }
-             /*   FirebaseFirestore db = FirebaseFirestore.getInstance();
+                String todayDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+                System.out.printf(todayDate);
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("Customers")
-                        .whereEqualTo("PersonalNumber","username")
+                        .whereEqualTo("PersonalNumber",usernameEditText.getText().toString())
+                        .whereEqualTo("Password",passwordEditText.getText().toString())
+                        .whereEqualTo("CheckinDate",todayDate)
                         .get()
                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-                                        fakeUser = new LoggedInUser(
+                                        /*fakeUser = new LoggedInUser(
                                                 document.get("PersonalNumber").toString(),
                                                 document.get("Name").toString());
+*/
+                                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                        intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
+                                        startActivity(intent);
 
                                         //Log.d(TAG, document.getId() + " => " + document.get("Name"));
                                     }
                                 } else {
-                                    Log.d(TAG, "Error getting documents: ", task.getException());
+                                    Toast.makeText(getApplicationContext(), "Login Failed!", Toast.LENGTH_LONG).show();
+                                    Log.d(TAG, "Login Failed!", task.getException());
                                 }
 
                             }
 
                         });
-             */
+
             }
         });
     }

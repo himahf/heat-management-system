@@ -34,7 +34,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import com.example.heat_manager.ui.login.LoginActivity;
 import com.example.heat_manager.ui.temp.TempActivity;
 
 import java.io.BufferedReader;
@@ -43,7 +42,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -111,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setCustomView(view);
 
         CurrentTemp=(TextView) findViewById(R.id.currentTemp);
-        UserPassword= (TextView) findViewById(R.id.userPassword);
+        UserPassword= (TextView) findViewById(R.id.TargetTemp);
 //        UserContact=findViewById(R.id.userContact);
        // UserComment=findViewById(R.id.usercomment);
         txtalertName=findViewById(R.id.userAlert);
@@ -568,16 +566,20 @@ public class MainActivity extends AppCompatActivity {
             duration = (hours*60)+mints;
             Log.i("duration","="+duration);
 
+            // calculate heating time
             getHeatingTime();
 
             if(heatingTime > (duration*60)){
                 createConnection("tdtool --on 2");
             }
             else{
+                int remainingSeconds = (int) (duration*60 - heatingTime);
+
                 Intent intent = new Intent(MainActivity.this, TempActivity.class);
                 intent.putExtra("TargetTemp", new Double(targetTemperature).toString());
                 intent.putExtra("CurrentTemp",  new Double(currentTemperature).toString());
                 intent.putExtra("HeatingTime", String.valueOf(heatingTime));
+                intent.putExtra("RemainingSeconds", String.valueOf(remainingSeconds));
                 startActivity(intent);
             }
         }
