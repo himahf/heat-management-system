@@ -46,6 +46,7 @@ public class TempActivity extends AppCompatActivity {
     TextView CurrentTemp;
     TextView TargetTemp;
     TextView TxtCountDown;
+    TextView TxtHeatingCountDown;
     EditText UserContact;
     EditText UserComment;
     Button BtnStopHeat;
@@ -75,6 +76,8 @@ public class TempActivity extends AppCompatActivity {
     private boolean heaterOn = false;
     private boolean startCounter = false;
     private CountDownTimer countDownTimer;
+    private CountDownTimer heatingCountDownTimer;
+    String HeatingTime;
 
 
     @Override
@@ -102,6 +105,7 @@ public class TempActivity extends AppCompatActivity {
             BtnStopHeat=findViewById(R.id.btnStopHeat);
             BtnSetNew=findViewById(R.id.btnSetNew);
             TxtCountDown=findViewById(R.id.countDown);
+            TxtHeatingCountDown = findViewById(R.id.countDown2);
             // read temp sensor value
             //getTemp();
 
@@ -109,6 +113,7 @@ public class TempActivity extends AppCompatActivity {
             String RemainingSeconds = intent.getStringExtra("RemainingSeconds");
             String TargetTem = intent.getStringExtra("TargetTemp");
             String CurrentTem = intent.getStringExtra("CurrentTemp");
+            HeatingTime = intent.getStringExtra("HeatingTime");
 
             int Heating_Time = Integer.parseInt(RemainingSeconds)*1000;
             System.out.printf("Heating_Time"+Heating_Time);
@@ -133,9 +138,11 @@ public class TempActivity extends AppCompatActivity {
 
                 public void onFinish() {
                     TxtCountDown.setText("Done!");
+                    // start heating process and counter
                     createConnection("tdtool --on 2");
                     heaterOn = true;
                     startCounter = false;
+                    heatingTimeCountdown();
                 }
             }.start();
 
@@ -266,4 +273,34 @@ public class TempActivity extends AppCompatActivity {
 
     }
 
+    // heating time countdown
+    public  void heatingTimeCountdown(){
+        int Heating_Time = Integer.parseInt(HeatingTime)*1000;
+        heatingCountDownTimer = new CountDownTimer(Heating_Time, 1000) {
+
+            public void onTick(long millisUntilFinished) {
+                // Used for formatting digit to be in 2 digits only
+                NumberFormat f = new DecimalFormat("00");
+
+                long hours = (millisUntilFinished / 3600000) % 24;
+                long mins = (millisUntilFinished / 60000) % 60;
+                long secs = (millisUntilFinished / 1000) % 60;
+
+                startCounter = true;
+                TxtHeatingCountDown.setText(f.format(hours) + ":" + f.format(mins) + ":" + f.format(secs));
+            }
+
+            public void onFinish() {
+                TxtHeatingCountDown.setText("Heating process done!");
+                createConnection("tdtool --off 2");
+                BtnStopHeat.setText("RESUME HEATING");
+                heaterOn = false;
+                startCounter = false;
+
+                // update new temperature
+                getTemp();
+            }
+        }.start();
+
+    }
 }

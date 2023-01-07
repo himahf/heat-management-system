@@ -150,6 +150,7 @@ private ActivityLoginBinding binding;
             public void onClick(View v) {
                 String todayDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
                 System.out.printf(todayDate);
+
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("Customers")
                         .whereEqualTo("PersonalNumber",usernameEditText.getText().toString())
