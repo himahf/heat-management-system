@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.StrictMode;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -29,9 +28,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import ch.ethz.ssh2.Session;
@@ -39,40 +36,24 @@ import ch.ethz.ssh2.StreamGobbler;
 
 public class TempActivity extends AppCompatActivity {
 
-    Spinner sp;
-    boolean invalid = false;
-    String Colector="";
     TextView txtalertName;
     TextView CurrentTemp;
     TextView TargetTemp;
     TextView TxtCountDown;
     TextView TxtHeatingCountDown;
-    EditText UserContact;
-    EditText UserComment;
     Button BtnStopHeat;
     Button BtnSetNew;
-    RadioButton Malebtn,Femalbtn;
-    CheckBox html,css,php;
-    Button btnInDatePicker, btnInTimePicker,btnOutDatePicker, btnOutTimePicker;
-    EditText txtInDate,txtInTime,txtOutDate,txtOutTime;
-    private int mYear, mMonth, mDay, mHour, mMinute;
-    private int mYear1, mMonth1, mDay1, mHour1, mMinute1;
-
-    int commonTempVal = 10;
 
     public double currentTemperature = 10;
     public double targetTemperature = 21;
-    public long targetTime;
     public double specificVolume = 0.85;
     public double specificHeatCapacity = 1.005;
     public int heat = 1500;
     public double heatLoss;
     public double coefficientOfHeatTransfer = 0.5;
     public double heatingTime;
-    public Connection connection;
     private Reservation reservation;
     public String commandOutput;
-    public int counter;
     private boolean heaterOn = false;
     private boolean startCounter = false;
     private CountDownTimer countDownTimer;
@@ -91,23 +72,16 @@ public class TempActivity extends AppCompatActivity {
             LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.logo, null);
             actionBar.setCustomView(view);
-//        sp=findViewById(R.id.SpCountry);
+
             CurrentTemp=(TextView) findViewById(R.id.userPassword1);
             TargetTemp= (TextView) findViewById(R.id.TargetTemp);
-//        UserContact=findViewById(R.id.userContact);
-            // UserComment=findViewById(R.id.usercomment);
+
             txtalertName=findViewById(R.id.userAlert);
-            //  Malebtn =findViewById(R.id.Male);
-            //   Femalbtn=findViewById(R.id.Female);
-            // html=findViewById(R.id.HTML);
-            //   css=findViewById(R.id.CSS);
-            //   php=findViewById(R.id.PHP);
+
             BtnStopHeat=findViewById(R.id.btnStopHeat);
             BtnSetNew=findViewById(R.id.btnSetNew);
             TxtCountDown=findViewById(R.id.countDown);
             TxtHeatingCountDown = findViewById(R.id.countDown2);
-            // read temp sensor value
-            //getTemp();
 
             Intent intent = getIntent();
             String RemainingSeconds = intent.getStringExtra("RemainingSeconds");
@@ -123,9 +97,8 @@ public class TempActivity extends AppCompatActivity {
             countDownTimer = new CountDownTimer(Heating_Time, 1000) {
 
                 public void onTick(long millisUntilFinished) {
-                    //TxtCountDown.setText("Time Remain = " +millisUntilFinished/1000 );
-                    // Used for formatting digit to be in 2 digits only
 
+                    // Used for formatting digit to be in 2 digits only
                     NumberFormat f = new DecimalFormat("00");
 
                     long hours = (millisUntilFinished / 3600000) % 24;
@@ -158,16 +131,7 @@ public class TempActivity extends AppCompatActivity {
                 }
             });
 
-            List<String> categoryCountry=new ArrayList<>();
-            categoryCountry.add("Select Country");
-            categoryCountry.add("PAKISTAN");
-            categoryCountry.add("AFGHANISTAN");
-            categoryCountry.add("UAE");
-            categoryCountry.add("TURKEY");
-            categoryCountry.add("AMERICA");
-            ArrayAdapter<String> arrayAdapter;
-            arrayAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,categoryCountry);
-            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         }
         catch(Exception e) {
 
@@ -184,11 +148,8 @@ public class TempActivity extends AppCompatActivity {
         reservation.Height = 3;
         reservation.Width = 20;
         reservation.Length = 30;
-        //reservation.NoOfPeople = 3;
         reservation.ObjectCount = 5;
         String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
-        //reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
-        //targetTime = reservation.CheckinDate.getTime();
 
         // calculate heat loss
         heatLoss = 2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +
@@ -260,11 +221,8 @@ public class TempActivity extends AppCompatActivity {
             createConnection("tdtool --off 2");
             BtnStopHeat.setText("RESUME HEATING");
             heaterOn = false;
-            //countDownTimer.cancel();
         }
-        //else if(heaterOn==false & startCounter){
 
-        //}
         else{
             createConnection("tdtool --on 2");
             BtnStopHeat.setText("STOP HEATING");

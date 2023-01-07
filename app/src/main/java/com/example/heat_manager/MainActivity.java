@@ -54,17 +54,10 @@ import ch.ethz.ssh2.StreamGobbler;
 
 public class MainActivity extends AppCompatActivity {
 
-    Spinner sp;
-    boolean invalid = false;
-    String Colector="";
     TextView txtalertName;
     TextView CurrentTemp;
     TextView UserPassword;
-    EditText UserContact;
-    EditText UserComment;
     Button SubmitSave;
-    RadioButton Malebtn,Femalbtn;
-    CheckBox html,css,php;
     Button btnInDatePicker, btnInTimePicker,btnOutDatePicker, btnOutTimePicker;
     EditText txtInDate,txtInTime,txtOutDate,txtOutTime;
     private int mYear, mMonth, mDay, mHour, mMinute;
@@ -77,14 +70,12 @@ public class MainActivity extends AppCompatActivity {
 
     public double currentTemperature = 22;
     public double targetTemperature = 22;
-    public long targetTime;
     public double specificVolume = 0.85;
     public double specificHeatCapacity = 1.005;
     public int heat = 1500;
     public double heatLoss;
     public double coefficientOfHeatTransfer = 0.5;
     public int heatingTime=0;
-    public Connection connection;
     private Reservation reservation;
     public String commandOutput;
     private String username;
@@ -99,10 +90,8 @@ public class MainActivity extends AppCompatActivity {
         username = intent.getStringExtra("PersonalNumber");
         Log.d(TAG, username);
 
-        //this.getActionBar().setTitle("Smart Heat System");
-//        sp=findViewById(R.id.SpCountry);
         ActionBar actionBar = getSupportActionBar();
-       // actionBar.setBackgroundDrawable(getResources().getDrawable(R.drawable.ic_launcher_background));
+
         actionBar.setDisplayShowCustomEnabled(true);
         LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
         View view = layoutInflater.inflate(R.layout.logo, null);
@@ -110,14 +99,7 @@ public class MainActivity extends AppCompatActivity {
 
         CurrentTemp=(TextView) findViewById(R.id.currentTemp);
         UserPassword= (TextView) findViewById(R.id.TargetTemp);
-//        UserContact=findViewById(R.id.userContact);
-       // UserComment=findViewById(R.id.usercomment);
         txtalertName=findViewById(R.id.userAlert);
-      //  Malebtn =findViewById(R.id.Male);
-     //   Femalbtn=findViewById(R.id.Female);
-       // html=findViewById(R.id.HTML);
-     //   css=findViewById(R.id.CSS);
-     //   php=findViewById(R.id.PHP);
         SubmitSave=findViewById(R.id.btnSubmit);
         btnInDatePicker = (Button) findViewById(R.id.btn_in_date);
         btnInTimePicker=(Button) findViewById(R.id.btn_in_time);
@@ -222,54 +204,6 @@ public class MainActivity extends AppCompatActivity {
         SubmitSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                String name = UserName.getText().toString();
-//                String Pascode=UserPassword.getText().toString();
-//                String contact=UserContact.getText().toString();
-//                String comment=UserComment.getText().toString();
-//                if (name.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the password field",Toast.LENGTH_SHORT).show();
-//                }
-//                else if (name.equals("Sameh") ||name.equals("UlHaq")){
-//                    invalid=true;
-//                    txtalertName.setText("Name Already exist");
-//                }
-//
-//                else if(Pascode.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the password field",Toast.LENGTH_SHORT).show();
-//                }
-//
-//
-//                else if (contact.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the Contact field",Toast.LENGTH_SHORT).show();
-//                }
-//
-//                else if (comment.isEmpty()){
-//                    Toast.makeText(MainActivity.this,"Pleas fill the Comment field",Toast.LENGTH_SHORT).show();
-//                }
-//
-//
-//
-//                else{
-//
-//                    Colector+=name+"\n";
-//                    Colector+=Pascode+"\n";
-//                    Colector+=contact+"\n";
-//                    Colector+=comment+"\n";
-//                    if (html.isChecked()){
-//                        Colector+="HTML"+"\n";
-//                        if (css.isChecked()){
-//                            Colector+="CSS"+"\n";
-//                        }
-//                        if (php.isChecked()){
-//                            Colector+="PHP"+"\n";
-//                        }
-//                    }
-//                    Toast.makeText(MainActivity.this,"User Info \n:"+Colector,Toast.LENGTH_SHORT).show();
-//                }
-//
-                //Intent intent = new Intent(MainActivity.this, TempActivity.class);
-                //startActivity(intent);
-
                 setTemperature();
             }
         });
@@ -365,55 +299,11 @@ public class MainActivity extends AppCompatActivity {
                 timePickerDialog.show();
             }
         });
-        List<String> categoryCountry=new ArrayList<>();
-        categoryCountry.add("Select Country");
-        categoryCountry.add("PAKISTAN");
-        categoryCountry.add("AFGHANISTAN");
-        categoryCountry.add("UAE");
-        categoryCountry.add("TURKEY");
-        categoryCountry.add("AMERICA");
-        ArrayAdapter<String> arrayAdapter;
-        arrayAdapter=new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,categoryCountry);
-        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        sp.setAdapter(arrayAdapter);
-//        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
-//                if(parent.getItemAtPosition(position).equals("Select Country")){
-//                    //Do Nothing
-//
-//                }
-//                else{
-//                    String item=parent.getItemAtPosition(position).toString();
-//                    Colector+=item+"\n";
-//                    Toast.makeText(MainActivity.this, "Selected Country: "+item, Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onNothingSelected(AdapterView<?> adapterView) {
-//
-//            }
-//        });
+
     }
 
     // get heating time
     protected double getHeatingTime(){
-
-        // create reservation object
-        /*reservation = new Reservation();
-        // need to fetch the data from db
-        reservation.Id = 1;
-        reservation.Height = 3;
-        reservation.Width = 20;
-        reservation.Length = 30;
-        //reservation.NoOfPeople = 3;
-        reservation.ObjectCount = 5;
-        String startDate = "2022-12-18T06:30:38.9933333"; // Input String for testing
-        reservation.CheckinDate = new SimpleDateFormat("dd/MM/yyyy").parse(startDate,new ParsePosition(0));
-        targetTime = reservation.CheckinDate.getTime();
-
-         */
 
         // heat loss due to an object
         // assumption

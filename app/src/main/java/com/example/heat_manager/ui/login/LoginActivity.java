@@ -18,7 +18,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -27,29 +26,19 @@ import android.widget.Toast;
 
 import com.example.heat_manager.MainActivity;
 import com.example.heat_manager.R;
-import com.example.heat_manager.data.model.LoggedInUser;
-import com.example.heat_manager.ui.login.LoginViewModel;
-import com.example.heat_manager.ui.login.LoginViewModelFactory;
 import com.example.heat_manager.databinding.ActivityLoginBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.stream.Stream;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -105,8 +94,6 @@ private ActivityLoginBinding binding;
                 }
                 setResult(Activity.RESULT_OK);
 
-
-
                 //Complete and destroy login activity once successful
                 finish();
             }
@@ -135,12 +122,7 @@ private ActivityLoginBinding binding;
 
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                /*if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    loginViewModel.login(usernameEditText.getText().toString(),
-                            passwordEditText.getText().toString());
-                }
 
-                 */
                 return false;
             }
         });
