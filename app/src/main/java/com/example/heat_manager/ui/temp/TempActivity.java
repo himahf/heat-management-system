@@ -35,6 +35,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,6 +81,7 @@ public class TempActivity extends AppCompatActivity {
     private Reservation reservation;
     public String commandOutput;
     public int counter;
+    private boolean heaterOn = false;
 
 
     @Override
@@ -92,7 +95,7 @@ public class TempActivity extends AppCompatActivity {
         View view = layoutInflater.inflate(R.layout.logo, null);
         actionBar.setCustomView(view);
 //        sp=findViewById(R.id.SpCountry);
-       // CurrentTemp=(TextView) findViewById(R.id.currentTemp);
+        CurrentTemp=(TextView) findViewById(R.id.userPassword1);
         UserPassword= (TextView) findViewById(R.id.userPassword);
 //        UserContact=findViewById(R.id.userContact);
        // UserComment=findViewById(R.id.usercomment);
@@ -108,14 +111,36 @@ public class TempActivity extends AppCompatActivity {
         // read temp sensor value
         //getTemp();
 
-        new CountDownTimer(30000, 1000) {
+        Intent intent = getIntent();
+        String HeatingTime = intent.getStringExtra("HeatingTime");
+        String TargetTemp = intent.getStringExtra("TargetTemp");
+        String CurrentTem = intent.getStringExtra("CurrentTemp");
+
+        int Heating_Time = Integer.parseInt(HeatingTime)*1000;
+        System.out.printf("Heating_Time"+Heating_Time);
+        UserPassword.setText(TargetTemp);
+        CurrentTemp.setText(CurrentTem);
+
+        new CountDownTimer(Heating_Time, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                TxtCountDown.setText("Time Remain = " +millisUntilFinished / 1000);
+                //TxtCountDown.setText("Time Remain = " +millisUntilFinished/1000 );
+                // Used for formatting digit to be in 2 digits only
+
+                NumberFormat f = new DecimalFormat("00");
+
+                long hours = (millisUntilFinished / 3600000) % 24;
+                long mins = (millisUntilFinished / 60000) % 60;
+                long secs = (millisUntilFinished / 1000) % 60;
+
+                TxtCountDown.setText(f.format(hours) + ":" + f.format(mins) + ":" + f.format(secs));
             }
 
             public void onFinish() {
-                TxtCountDown.setText("done!");
+                TxtCountDown.setText("Done!");
+                createConnection("tdtool --on 2");
+                heaterOn = true;
+                BtnStopHeat.setText("RESUME HEATING");
             }
         }.start();
 
@@ -237,4 +262,17 @@ public class TempActivity extends AppCompatActivity {
         currentTemperature = Double.parseDouble(commandOutput);
         CurrentTemp.setText(Double.toString(currentTemperature));
     }
+
+    // get turn off
+    public void clickStopHeat(View v){
+
+        if(heaterOn){
+            createConnection("tdtool --off 2");
+        }
+        else{
+            createConnection("tdtool --on 2");
+        }
+
+    }
+
 }

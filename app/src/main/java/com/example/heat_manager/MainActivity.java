@@ -78,14 +78,14 @@ public class MainActivity extends AppCompatActivity {
     int commonTempVal = 24;
 
     public double currentTemperature = 22;
-    public double targetTemperature = 24;
+    public double targetTemperature = 22;
     public long targetTime;
     public double specificVolume = 0.85;
     public double specificHeatCapacity = 1.005;
     public int heat = 1500;
     public double heatLoss;
     public double coefficientOfHeatTransfer = 0.5;
-    public double heatingTime=0;
+    public int heatingTime=0;
     public Connection connection;
     private Reservation reservation;
     public String commandOutput;
@@ -269,8 +269,8 @@ public class MainActivity extends AppCompatActivity {
 //                    Toast.makeText(MainActivity.this,"User Info \n:"+Colector,Toast.LENGTH_SHORT).show();
 //                }
 //
-                Intent intent = new Intent(MainActivity.this, TempActivity.class);
-                startActivity(intent);
+                //Intent intent = new Intent(MainActivity.this, TempActivity.class);
+                //startActivity(intent);
 
                 setTemperature();
             }
@@ -427,9 +427,10 @@ public class MainActivity extends AppCompatActivity {
                 (reservation.ObjectCount * heatLossForObject);
 
         // calculate heating time
-        heatingTime = (reservation.Height * reservation.Length * reservation.Width * specificHeatCapacity
+        double heating_Time = (reservation.Height * reservation.Length * reservation.Width * specificHeatCapacity
                 * (targetTemperature - currentTemperature)) /
                 (specificVolume * (heat - heatLoss));
+        heatingTime = (int) Math.floor(heating_Time);
 
         System.out.println("heating time: "+heatingTime);
         return heatingTime;
@@ -568,11 +569,14 @@ public class MainActivity extends AppCompatActivity {
 
             getHeatingTime();
 
-            if(heatingTime > duration){
+            if(heatingTime > (duration*60)){
                 createConnection("tdtool --on 2");
             }
             else{
                 Intent intent = new Intent(MainActivity.this, TempActivity.class);
+                intent.putExtra("TargetTemp", new Double(targetTemperature).toString());
+                intent.putExtra("CurrentTemp",  new Double(currentTemperature).toString());
+                intent.putExtra("HeatingTime", String.valueOf(heatingTime));
                 startActivity(intent);
             }
         }
