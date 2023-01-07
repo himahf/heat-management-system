@@ -152,7 +152,7 @@ private ActivityLoginBinding binding;
                 System.out.printf(todayDate);
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("Customers")
+                db.collection("User")
                         .whereEqualTo("PersonalNumber",usernameEditText.getText().toString())
                         .whereEqualTo("Password",passwordEditText.getText().toString())
                         .whereEqualTo("CheckinDate",todayDate)
@@ -162,15 +162,11 @@ private ActivityLoginBinding binding;
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-                                        /*fakeUser = new LoggedInUser(
-                                                document.get("PersonalNumber").toString(),
-                                                document.get("Name").toString());
-*/
+
                                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                         intent.putExtra("PersonalNumber", usernameEditText.getText().toString());
                                         startActivity(intent);
 
-                                        //Log.d(TAG, document.getId() + " => " + document.get("Name"));
                                     }
                                 } else {
                                     Toast.makeText(getApplicationContext(), "Login Failed!", Toast.LENGTH_LONG).show();

@@ -500,7 +500,7 @@ public class MainActivity extends AppCompatActivity {
     void getReservationDetails(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("Customers")
+        db.collection("Reservations")
                 .whereEqualTo("PersonalNumber",username)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
