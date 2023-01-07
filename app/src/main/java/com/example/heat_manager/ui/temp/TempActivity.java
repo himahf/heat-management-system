@@ -82,6 +82,8 @@ public class TempActivity extends AppCompatActivity {
     public String commandOutput;
     public int counter;
     private boolean heaterOn = false;
+    private boolean startCounter = false;
+    private CountDownTimer countDownTimer;
 
 
     @Override
@@ -121,7 +123,7 @@ public class TempActivity extends AppCompatActivity {
         UserPassword.setText(TargetTemp);
         CurrentTemp.setText(CurrentTem);
 
-        new CountDownTimer(Heating_Time, 1000) {
+        countDownTimer = new CountDownTimer(Heating_Time, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 //TxtCountDown.setText("Time Remain = " +millisUntilFinished/1000 );
@@ -133,6 +135,7 @@ public class TempActivity extends AppCompatActivity {
                 long mins = (millisUntilFinished / 60000) % 60;
                 long secs = (millisUntilFinished / 1000) % 60;
 
+                startCounter = true;
                 TxtCountDown.setText(f.format(hours) + ":" + f.format(mins) + ":" + f.format(secs));
             }
 
@@ -140,7 +143,7 @@ public class TempActivity extends AppCompatActivity {
                 TxtCountDown.setText("Done!");
                 createConnection("tdtool --on 2");
                 heaterOn = true;
-                BtnStopHeat.setText("RESUME HEATING");
+                startCounter = false;
             }
         }.start();
 
@@ -148,6 +151,9 @@ public class TempActivity extends AppCompatActivity {
         BtnSetNew.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                createConnection("tdtool --off 2");
+                heaterOn = false;
+
                 Intent intent = new Intent(TempActivity.this, MainActivity.class);
                 startActivity(intent);
             }
@@ -268,9 +274,17 @@ public class TempActivity extends AppCompatActivity {
 
         if(heaterOn){
             createConnection("tdtool --off 2");
+            BtnStopHeat.setText("RESUME HEATING");
+            heaterOn = false;
+            countDownTimer.cancel();
+        }
+        else if(heaterOn==false & startCounter){
+
         }
         else{
             createConnection("tdtool --on 2");
+            BtnStopHeat.setText("STOP HEATING");
+            heaterOn = true;
         }
 
     }

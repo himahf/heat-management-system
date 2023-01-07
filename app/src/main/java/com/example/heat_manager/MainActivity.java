@@ -420,6 +420,7 @@ public class MainActivity extends AppCompatActivity {
         // heat loss due to an object
         // assumption
         int heatLossForObject = 5;
+        targetTemperature = numberPicker.getValue();
 
         // calculate heat loss
         heatLoss = (2 * (coefficientOfHeatTransfer * reservation.Height * reservation.Width * (targetTemperature - currentTemperature)) +

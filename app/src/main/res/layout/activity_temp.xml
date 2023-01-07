@@ -138,7 +138,7 @@
             android:layout_marginLeft="5dp"
             android:layout_marginRight="50dp"
             android:background="#B71C1C"
-            android:onClick="turnOff"
+            android:onClick="clickStopHeat"
             android:text="Stop Heating"
             android:textColor="#F5FBF6" />
 

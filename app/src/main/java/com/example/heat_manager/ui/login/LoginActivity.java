@@ -1,6 +1,10 @@
 package  com.example.heat_manager.ui.login;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
+
+import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -11,6 +15,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -22,9 +27,15 @@ import android.widget.Toast;
 
 import com.example.heat_manager.MainActivity;
 import com.example.heat_manager.R;
+import com.example.heat_manager.data.model.LoggedInUser;
 import com.example.heat_manager.ui.login.LoginViewModel;
 import com.example.heat_manager.ui.login.LoginViewModelFactory;
 import com.example.heat_manager.databinding.ActivityLoginBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -141,7 +152,31 @@ private ActivityLoginBinding binding;
              startActivity(intent);
              if (userExist(username, fileName)){
 
-            }}
+             }
+             /*   FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("Customers")
+                        .whereEqualTo("PersonalNumber","username")
+                        .get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                        fakeUser = new LoggedInUser(
+                                                document.get("PersonalNumber").toString(),
+                                                document.get("Name").toString());
+
+                                        //Log.d(TAG, document.getId() + " => " + document.get("Name"));
+                                    }
+                                } else {
+                                    Log.d(TAG, "Error getting documents: ", task.getException());
+                                }
+
+                            }
+
+                        });
+             */
+            }
         });
     }
 

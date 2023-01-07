@@ -163,7 +163,7 @@
                 android:layout_weight="2"
                 android:text="TIME"
                 android:textSize="10dp"
-                android:visibility="invisible" />
+                android:visibility="visible" />
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
@@ -223,7 +223,7 @@
                 android:layout_weight="2"
                 android:text="TIME"
                 android:textSize="10dp"
-                android:visibility="invisible" />
+                android:visibility="visible" />
         </LinearLayout>
     </LinearLayout>
 
